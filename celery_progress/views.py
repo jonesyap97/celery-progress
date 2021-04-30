@@ -6,5 +6,6 @@ from django.views.decorators.cache import never_cache
 
 @never_cache
 def get_progress(request, task_id):
+    print("calling progres.....")
     progress = Progress(AsyncResult(task_id))
     return HttpResponse(json.dumps(progress.get_info()), content_type='application/json')
