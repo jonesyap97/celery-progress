@@ -29,6 +29,8 @@ class CeleryProgressBar {
             ignored: '#7a7a7a'
         }
         this.barColors = Object.assign({}, barColorsDefault, options.barColors);
+        //Redirect URL when success
+        this.redirectOnSuccessURL = options.redirectOnSuccessURL
     }
 
     onSuccessDefault(progressBarElement, progressBarMessageElement, result) {
@@ -92,6 +94,13 @@ class CeleryProgressBar {
         }
     }
 
+    //Redirect when task success
+    redirectOnSuccess(url){
+        setTimeout(()=>{
+            window.location.href = url
+        }, 3000)
+    }
+
     /**
      * Process update message data.
      * @return true if the task is complete, false if it's not, undefined if `data` is invalid
@@ -110,13 +119,16 @@ class CeleryProgressBar {
                     this.onRetry(this.progressBarElement, this.progressBarMessageElement, data.result.message, data.result.when);
                     done = false;
                     delete data.result;
-                } else {
+                }
+                else if(data.state === 'REVOKED'){
+                    this.onIgnored(this.progressBarElement, this.progressBarMessageElement, data.result);  
+                }               
+                else {
                     this.onTaskError(this.progressBarElement, this.progressBarMessageElement, data.result);
                 }
             } else {
                 if (data.state === 'IGNORED') {
                     this.onIgnored(this.progressBarElement, this.progressBarMessageElement, data.result);
-                    delete data.result;
                 } else {
                     done = undefined;
                     this.onDataError(this.progressBarElement, this.progressBarMessageElement, "Data Error");
@@ -154,6 +166,9 @@ class CeleryProgressBar {
 
             if (complete === false) {
                 setTimeout(this.connect.bind(this), this.pollInterval);
+            }
+            else{
+                // this.redirectOnSuccess(this.redirectOnSuccessURL)
             }
         } else {
             this.onHttpError(this.progressBarElement, this.progressBarMessageElement, "HTTP Code " + response.status, response);
