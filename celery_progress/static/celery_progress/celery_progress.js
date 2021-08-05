@@ -77,6 +77,7 @@ class CeleryProgressBar {
         var description = progress.description || "";
         if (progress.current == 0) {
             if (progress.pending === true) {
+                // progressBarMessageElement.textContent = 'Waiting for task to start...';
                 progressBarMessageElement.textContent = 'Waiting for task to start...';
             } else {
                 progressBarMessageElement.textContent = 'Task started...';
